@@ -14,6 +14,7 @@ class Node
     this.isObstacle = isObstacle;
     this.wasVisisted = false;
     this.color = isObstacle ? '#000' : 'transparent';
+    this.parent = null;
   }
 
   isEqualTo(other)

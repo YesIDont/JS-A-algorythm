@@ -4,15 +4,16 @@ window.addEventListener('load', () => {
   let refNode = null;
 
   const grid = new Grid({
-    // width: 64,
-    // height: 64,
-    // size: 8,
-    obstaclesDensity: 300,
-    mode: 'walls',
+    // width: 256,
+    // height: 256,
+    // size: 4,
+    obstaclesDensity: 0,
+    // mode: 'walls',
     // delay: 100,
     // isRuntime: true,
     randomOriginAndTarget: false,
-    // loadDummyMap: true,
+    loadDummyMap: true,
+    costMultiplier: 1,
   });
 
   if (grid.isRuntime)
@@ -40,10 +41,10 @@ window.addEventListener('load', () => {
             if (!node.isObstacle) {
               grid.setTarget(node);
             };
-            isPathfindingBlocked = false;
           }
         }
-      }
+      };
+      isPathfindingBlocked = false;
     });
   
     document.addEventListener('mousedown', ({ target }) => {

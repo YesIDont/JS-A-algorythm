@@ -1,6 +1,7 @@
 const mouse = {
   x: 0,
   y: 0,
+  isLeftDown: false,
 };
 
 function getmousePosition( e )

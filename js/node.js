@@ -65,12 +65,16 @@ class Node
   {
     this.isObstacle = true;
     this.color = '#000';
+
+    return this;
   }
 
   setAsNonObstacle()
   {
     this.isObstacle = false;
     this.color = 'transparent';
+
+    return this;
   }
 
   getCopy()

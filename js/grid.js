@@ -116,38 +116,35 @@ class Grid
     return null;
   }
 
-  makeWall(start, end)
+  makeWall(start, end, clearWallChance = 0)
   {
     let min, max;
     const isHorizontal = start.y === end.y;
     const mod = isHorizontal ? 'x' : 'y';
-      min = Math.min(start[mod], end[mod]);
-      max = Math.max(start[mod], end[mod]);
-      for (let i = min; i <= max; i++ )
+    min = Math.min(start[mod], end[mod]);
+    max = Math.max(start[mod], end[mod]);
+    const isClearWall = dice100(clearWallChance);
+    for (let i = min; i <= max; i++ )
+    {
+      const x = isHorizontal ? i : start.x;
+      const y = isHorizontal ? start.y : i;
+      if (this.nodes[x] && this.nodes[x][y])
       {
-        const x = isHorizontal ? i : start.x;
-        const y = isHorizontal ? start.y : i;
-        if (this.nodes[x] && this.nodes[x][y])
-        {
-          this.nodes[x][y].setAsObstacle();
-        }
+        const node = this.nodes[x][y];
+        node.setAsObstacle();
+        if (isClearWall) node.setAsNonObstacle();
       }
+    }
   }
 
-  makeRandomWall(randomObstacle = false)
+  makeRandomWall(clearWallChance = 40)
   {
     const start = this.getRandomNode();
     const end = start.getCopy();
     const mod = flipCoin() ? 'x' : 'y';
     const size = getRandomFromRange(0, mod === 'x' ? this.width : this.height);
     end[mod] += getRandomFromRange(-size, size);
-
-    const newWall = this.makeWall(start, end);
-
-    if (randomObstacle && dice100(20))
-    {
-      newWall.setAsNonObstacle();
-    }
+    this.makeWall(start, end, clearWallChance);
   }
 
   getNeighbours(refNode)

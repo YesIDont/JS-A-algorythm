@@ -7,13 +7,13 @@ window.addEventListener('load', () => {
     // width: 256,
     // height: 256,
     // size: 4,
-    obstaclesDensity: 230,
+    obstaclesDensity: 620,
     mode: 'walls',
     // delay: 100,
     isRuntime: true,
     randomOriginAndTarget: false,
     // loadDummyMap: true,
-    // costMultiplier: 1.5,
+    // costMultiplier: 2,
   });
 
   if (grid.isRuntime)

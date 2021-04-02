@@ -35,16 +35,39 @@ class Node
     return Math.sqrt(x * x + y * y);
   }
 
+  get_fCost(target)
+  {
+    return this.gCost + this.getEuclideanDistance(target);
+    // return this.gCost + this.getManhatanDistanceTo(target);
+    // return this.gCost + this.getWeightedDistanceTo(target);
+  }
+
   set_fCost(target)
   {
-    this.fCost = this.gCost + this.getManhatanDistanceTo(target);
+    this.fCost = this.gCost + this.getEuclideanDistance(target);
+    // this.fCost = this.gCost + this.getManhatanDistanceTo(target);
+    // this.fCost = this.gCost + this.getWeightedDistanceTo(target);
     return this.fCost;
   }
 
-  getDistanceTo(other)
+  getCoordiatesDifference(other)
   {
-    const dx = Math.abs(this.x - other.x);
-    const dy = Math.abs(this.y - other.y);
+    return {
+      dx: Math.abs(this.x - other.x),
+      dy: Math.abs(this.y - other.y),
+    }
+  }
+
+  getEuclideanDistance(other)
+  {
+    const { dx, dy } = this.getCoordiatesDifference(other);
+
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  getWeightedDistanceTo(other)
+  {
+    const { dx, dy } = this.getCoordiatesDifference(other);
 
     if (dx > dy)
     {
@@ -55,8 +78,7 @@ class Node
 
   getManhatanDistanceTo(other)
   {
-    const dx = Math.abs(other.x - this.x);
-    const dy = Math.abs(other.y - this.y);
+    const { dx, dy } = this.getCoordiatesDifference(other);
 
     return dx + dy;
   }

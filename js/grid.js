@@ -137,7 +137,7 @@ class Grid
     }
   }
 
-  makeRandomWall(clearWallChance = 40)
+  makeRandomWall(clearWallChance = 70)
   {
     const start = this.getRandomNode();
     const end = start.getCopy();
@@ -191,7 +191,7 @@ class Grid
     this.isPerformingPathfinding = false;
   }
 
-  getLowestFCost(array)
+  getItemWithLowestFCost(array)
   {
     const lowest = array.reduce((acc, val) => {
       if (val.fCost < acc.fCost) return val;
@@ -200,6 +200,21 @@ class Grid
     }, array[0]);
 
     return lowest;
+  }
+
+  getMostPromissingItem(array)
+  {
+    let result = array[0];
+    for (let i = 1; i < array.length - 1; i++)
+    {
+      const node = array[i];
+      if (node.fCost < result.fCost || node.fCost === result.fCost && node.hCost > result.hCost)
+      {
+        result = node;
+      }
+    };
+
+    return result;
   }
 
   aStar()
@@ -212,7 +227,7 @@ class Grid
 
     let frontier = [];
     origin.gCost = 0;
-    origin.set_fCost(target);
+    origin.fCost = origin.get_fCost(target);
     frontier.push(origin);
 
     this.isPerformingPathfinding = true;
@@ -229,16 +244,9 @@ class Grid
 
   aStarLoop(frontier, origin, target, startTime)
   {
-    let current = this.getLowestFCost(frontier);
-    // let current = frontier[0];
-    // for (let i = 1; i < frontier.length - 1; i++)
-    // {
-    //   const node = frontier[i];
-    //   if (node.fCost < current.fCost || node.fCost === current.fCost && node.hCost < current.hCost)
-    //   {
-    //     current = node;
-    //   }
-    // }
+    // let current = this.getMostPromissingItem(frontier);
+    let current = this.getItemWithLowestFCost(frontier);
+    
     if (!current)
     {
       this.isPerformingPathfinding = false;
@@ -267,21 +275,19 @@ class Grid
     frontier = frontier.filter(node => !node.isEqualTo(current));
 
     this.getNeighbours(current).forEach(neighbour => {
-      const newCost = current.gCost + current.getDistanceTo(neighbour);
       const isntInFrontier = frontier.every(node => !node.isEqualTo(neighbour));
-      if (!neighbour.gCost || newCost < neighbour.gCost)
+      if (isntInFrontier)
       {
-        neighbour.gCost = newCost;
-        neighbour.hCost = target.getDistanceTo(neighbour);
-        neighbour.fCost = neighbour.gCost + (neighbour.hCost * this.costMultiplier);
-        neighbour.parent = current;
-
-        if (isntInFrontier)
+        frontier.push(neighbour);
+        neighbour.gCost = current.gCost + 1;
+        const new_fCost = neighbour.get_fCost(target);
+        if (neighbour.fCost === null || new_fCost < neighbour.fCost)
         {
-          frontier.push(neighbour);
+          neighbour.fCost = new_fCost;
+          neighbour.parent = current;
           if (!this.isRuntime) neighbour.color = '#ff9900';
         }
-      }
+      };
     });
 
     if (frontier.length > 0)

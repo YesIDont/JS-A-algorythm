@@ -9,7 +9,7 @@ class AStarPathfinder
     this.isSerching = false;
   }
 
-  findPath(origin, target)
+  findPath(origin, target, usePathCallback)
   {
     if (!this.isSerching && origin && target)
     {
@@ -27,9 +27,8 @@ class AStarPathfinder
         this._logPathTimeAndLenght(Date.now() - startTime, path.length);
       }
 
+      usePathCallback(path);
       this.isSerching = false;
-
-      return path;
     }
   }
 

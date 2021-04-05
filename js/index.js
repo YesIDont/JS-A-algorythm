@@ -6,11 +6,11 @@ window.addEventListener('load', () => {
   let refNode = null;
 
   grid = new Grid({
-    width: 128,
-    height: 128,
-    nodeSize: 6,
-    obstaclesDensity: 30,
-    // mode: 'walls',
+    width: 256,
+    height: 256,
+    nodeSize: 3,
+    obstaclesDensity: 300,
+    mode: 'walls',
     isRuntime: true,
     randomOriginAndTarget: false,
     // loadDummyMap: true,
@@ -69,7 +69,7 @@ window.addEventListener('load', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (grid.isRuntime && !pathfinder.isSerching && !isPathfindingBlocked)
     {
-      grid.path = pathfinder.findPath(grid.origin, grid.target);
+      pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
       isPathfindingBlocked = true;
     }
     grid.drawGrid();

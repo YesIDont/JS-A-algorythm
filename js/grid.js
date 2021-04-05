@@ -49,7 +49,7 @@ class Grid
     
     if (hasWalls)
     {
-      doNTimes(obstaclesDensity, () => { this.makeRandomWall(); });
+      doNTimes((width * nodeSize) * obstaclesDensity, () => { this.makeRandomWall(); });
     }
 
     if (this.randomOriginAndTarget)

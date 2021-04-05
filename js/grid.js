@@ -31,16 +31,18 @@ class Grid
 
     if (loadDummyMap)
     {
-      this.nodes = dummyMap.map(row => row.map(node => new Node(node.x, node.y, this.nodeSize, node.isObstacle)));
+      this.nodes = dummyMap.map(row => row.map(node => new Node(node.x, node.y, this.nodeSize, node.isObstacle, node.id)));
     }
     else
     {
+      let idCounter = 0;
       for (let row = 0; row < height; row++)
       {
         this.nodes[row] = [];
         for (let column = 0; column < width; column++)
         {
-          this.nodes[row][column] = new Node(row, column, size, hasWalls ? 0 : dice100(obstaclesDensity));
+          this.nodes[row][column] = new Node(row, column, size, hasWalls ? 0 : dice100(obstaclesDensity), idCounter);
+          idCounter++;
         }
       };
     };

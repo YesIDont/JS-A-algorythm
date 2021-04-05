@@ -1,7 +1,8 @@
 class Node
 {
-  constructor(row, column, size, isObstacle)
+  constructor(row, column, size, isObstacle, id)
   {
+    this.id = id;
     this.x = row;
     this.y = column;
     this.size = size;
@@ -20,7 +21,7 @@ class Node
 
   isEqualTo(other)
   {
-    return this.x === other.x && this.y === other.y;
+    return this.id == other.id;
   }
 
   compare_fCostTo(B)
@@ -116,7 +117,7 @@ class Node
 
   getCopy()
   {
-    return new Node(this.x, this.y, this.size, this.isObstacle);
+    return new Node(this.x, this.y, this.size, this.isObstacle, this.id);
   }
 
   draw(isPartOfPath)

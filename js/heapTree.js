@@ -13,11 +13,12 @@ class heapTree {
     this.currentItemCount++;
   }
 
-  pullOutLowest()
+  pullOutTheLowest()
   {
     const firstItem = this.items[0];
     this.currentItemCount--;
     this.items[0] = this.items[this.currentItemCount];
+    if (!this.items[0]) return undefined;
     this.items[0].heapIndex = 0;
     this._sortDown(this.items[0]);
 
@@ -32,6 +33,12 @@ class heapTree {
   getLength()
   {
     return this.currentItemCount;
+  }
+
+  reset()
+  {
+    this.items = [];
+    this.currentItemCount = 0;
   }
 
   _compareItems(A, B)

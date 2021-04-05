@@ -1,7 +1,6 @@
 class Grid
 {
   constructor({
-    delay = 0,
     height = 64,
     isRuntime = false,
     loadDummyMap = false,
@@ -12,9 +11,7 @@ class Grid
     width = 64,
   })
   {
-    this.delay = delay;
     this.height = height;
-    this.isPerformingPathfinding = false;
     this.isRuntime = isRuntime;
     this.neighbourAddressMods = [[0, -1], [1, 0], [0, 1], [-1, 0]];
     this.nodes = [[]];
@@ -66,20 +63,36 @@ class Grid
     }
   }
 
+  drawGrid()
+  {
+    const size = this.nodeSize;
+    const rows = this.nodes.length;
+    const columns = this.nodes[0].length;
+    let r = 0;
+    let c = 0;
+
+    for (r; r < rows; r++)
+    {
+      canvas.drawLine(0, r * size, columns * size, r * size, '#d1d1d1');
+    }
+
+    for (c; c < columns; c++)
+    {
+      canvas.drawLine(c * size, 0, c * size, rows * size, '#d1d1d1');
+    }
+    
+  }
+
   drawNodes()
   {
     this.nodes.forEach(row => {
       row.forEach(node => {
-        const { x, y, size } = node;
-        
+        const { x, y } = node;
+        const size = this.nodeSize;
+
         const isPartOfPath = this.path && this.path.some(pathNode => pathNode.isEqualTo(node));
         ctx.fillStyle = isPartOfPath ? '#ff0000' : node.color;
         ctx.fillRect(x * size, y * size, size, size);
-
-        ctx.strokeStyle = '#d1d1d1';
-        ctx.beginPath();
-        ctx.rect(x * size, y * size, size, size);
-        ctx.stroke();
       });
     });
   }
@@ -196,100 +209,5 @@ class Grid
         }
       });
     });
-  }
-
-  closeSearch(startTime, pathLength)
-  {
-    console.log(`A* Algorithm found path: ${Date.now() - startTime} ms. The path length is: ${pathLength}`);
-    this.isPerformingPathfinding = false;
-  }
-
-  aStar()
-  {
-    if (!this.origin || !this.target) return;
-    const { origin, target } = this;
-    const startTime = Date.now();
-    
-    this.reset();
-
-    let frontier = new heapTree();
-    origin.gCost = 0;
-    origin.fCost = origin.get_fCost(target);
-    frontier.add(origin);
-
-    this.isPerformingPathfinding = true;
-
-    if (this.isRuntime)
-    {
-      this.aStarLoop(frontier, origin, target, startTime);
-    }
-    else
-    {
-      this.aStarLoopDelayed(frontier, origin, target, startTime); 
-    }
-  }
-
-  aStarLoop(frontier, origin, target, startTime)
-  {
-    let current = frontier.pullOutLowest();
-    
-    if (!current)
-    {
-      this.isPerformingPathfinding = false;
-      return;
-    }
-
-    if (!this.isRuntime && !current.isEqualTo(origin)) current.color = '#d1d1d1';
-
-    if (current.isEqualTo(target))
-    {
-      this.path = [];
-      current = target.parent;
-      while(!current.isEqualTo(origin))
-      {
-        this.path.push(current);
-        current = current.parent;
-      }
-      this.path.reverse();
-
-      this.closeSearch(startTime, this.path.length);
-
-      return;
-    }
-
-    current.wasVisisted = true;
-
-    this.getNeighbours(current).forEach(neighbour => {
-      if (!frontier.isItemInTheTree(neighbour))
-      {
-        frontier.add(neighbour);
-        neighbour.gCost = current.gCost + 1;
-        const new_fCost = neighbour.get_fCost(target);
-        if (neighbour.fCost === null || new_fCost < neighbour.fCost)
-        {
-          neighbour.fCost = new_fCost;
-          neighbour.parent = current;
-          if (!this.isRuntime) neighbour.color = '#ff9900';
-        }
-      };
-    });
-
-    if (frontier.getLength() > 0)
-    {
-      if (this.isRuntime) this.aStarLoop(frontier, origin, target, startTime)
-      else this.aStarLoopDelayed(frontier, origin, target, startTime);
-    }
-    else
-    {
-      this.isPerformingPathfinding = false;
-    }
-  }
-
-  aStarLoopDelayed(frontier, origin, target, startTime)
-  {
-    setTimeout(() => {
-      if (frontier.getLength() > 0) this.aStarLoop(frontier, origin, target, startTime)
-      else this.isPerformingPathfinding = false;
-    }, this.delay);
   }
 };

@@ -119,17 +119,4 @@ class Node
   {
     return new Node(this.x, this.y, this.size, this.isObstacle, this.id);
   }
-
-  draw(isPartOfPath)
-  {
-    const { x, y, size } = this;
-
-    ctx.fillStyle = isPartOfPath ? '#ff0000' : this.color;
-    ctx.fillRect(x * size, y * size, size, size);
-
-    ctx.strokeStyle = '#d1d1d1';
-    ctx.beginPath();
-    ctx.rect(x * size, y * size, size, size);
-    ctx.stroke();
-  }
 }

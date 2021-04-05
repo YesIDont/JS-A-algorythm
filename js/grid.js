@@ -1,7 +1,6 @@
 class Grid
 {
   constructor({
-    costMultiplier = 1,
     delay = 0,
     height = 64,
     isRuntime = false,
@@ -9,7 +8,7 @@ class Grid
     mode = 'random',
     obstaclesDensity = 10,
     randomOriginAndTarget = true,
-    size = 8,
+    nodeSize = 8,
     width = 64,
   })
   {
@@ -19,7 +18,7 @@ class Grid
     this.isRuntime = isRuntime;
     this.neighbourAddressMods = [[0, -1], [1, 0], [0, 1], [-1, 0]];
     this.nodes = [[]];
-    this.nodeSize = size;
+    this.nodeSize = nodeSize;
     this.origin = null;
     this.path = [];
     this.randomOriginAndTarget = randomOriginAndTarget;
@@ -32,7 +31,7 @@ class Grid
     if (loadDummyMap)
     {
       this.nodes = dummyMap.map(row => row.map(node => {
-        const copy = new Node(node.x, node.y, this.nodeSize, node.isObstacle, idCounter);
+        const copy = new Node(node.x, node.y, nodeSize, node.isObstacle, idCounter);
         idCounter++;
 
         return copy;
@@ -45,7 +44,7 @@ class Grid
         this.nodes[row] = [];
         for (let column = 0; column < width; column++)
         {
-          this.nodes[row][column] = new Node(row, column, size, hasWalls ? 0 : dice100(obstaclesDensity), idCounter);
+          this.nodes[row][column] = new Node(row, column, nodeSize, hasWalls ? 0 : dice100(obstaclesDensity), idCounter);
           idCounter++;
         }
       };
@@ -71,8 +70,16 @@ class Grid
   {
     this.nodes.forEach(row => {
       row.forEach(node => {
+        const { x, y, size } = node;
+        
         const isPartOfPath = this.path && this.path.some(pathNode => pathNode.isEqualTo(node));
-        node.draw(isPartOfPath);
+        ctx.fillStyle = isPartOfPath ? '#ff0000' : node.color;
+        ctx.fillRect(x * size, y * size, size, size);
+
+        ctx.strokeStyle = '#d1d1d1';
+        ctx.beginPath();
+        ctx.rect(x * size, y * size, size, size);
+        ctx.stroke();
       });
     });
   }

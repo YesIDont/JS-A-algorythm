@@ -15,11 +15,26 @@ class Node
     this.wasVisisted = false;
     this.color = isObstacle ? '#000' : 'transparent';
     this.parent = null;
+    this.heapIndex = null;
   }
 
   isEqualTo(other)
   {
     return this.x === other.x && this.y === other.y;
+  }
+
+  compare_fCostTo(B)
+  {
+    if (this.fCost < B.fCost) return -1;
+    if (this.fCost === B.fCost) return 0;
+    return 1;
+  }
+
+  compare_hCostTo(B)
+  {
+    if (this.hCost < B.hCost) return -1;
+    if (this.hCost === B.hCost) return 0;
+    return 1;
   }
 
   getStamp()

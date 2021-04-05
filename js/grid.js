@@ -13,7 +13,6 @@ class Grid
     width = 64,
   })
   {
-    this.costMultiplier = costMultiplier;
     this.delay = delay;
     this.height = height;
     this.isPerformingPathfinding = false;
@@ -29,13 +28,18 @@ class Grid
 
     const hasWalls = mode === 'walls';
 
+    let idCounter = 0;
     if (loadDummyMap)
     {
-      this.nodes = dummyMap.map(row => row.map(node => new Node(node.x, node.y, this.nodeSize, node.isObstacle, node.id)));
+      this.nodes = dummyMap.map(row => row.map(node => {
+        const copy = new Node(node.x, node.y, this.nodeSize, node.isObstacle, idCounter);
+        idCounter++;
+
+        return copy;
+      }));
     }
     else
     {
-      let idCounter = 0;
       for (let row = 0; row < height; row++)
       {
         this.nodes[row] = [];

@@ -31,16 +31,18 @@ class Grid
 
     if (loadDummyMap)
     {
-      this.nodes = dummyMap.map(row => row.map(node => new Node(node.x, node.y, this.nodeSize, node.isObstacle)));
+      this.nodes = dummyMap.map(row => row.map(node => new Node(node.x, node.y, this.nodeSize, node.isObstacle, node.id)));
     }
     else
     {
+      let idCounter = 0;
       for (let row = 0; row < height; row++)
       {
         this.nodes[row] = [];
         for (let column = 0; column < width; column++)
         {
-          this.nodes[row][column] = new Node(row, column, size, hasWalls ? 0 : dice100(obstaclesDensity));
+          this.nodes[row][column] = new Node(row, column, size, hasWalls ? 0 : dice100(obstaclesDensity), idCounter);
+          idCounter++;
         }
       };
     };
@@ -191,32 +193,6 @@ class Grid
     this.isPerformingPathfinding = false;
   }
 
-  getItemWithLowestFCost(array)
-  {
-    const lowest = array.reduce((acc, val) => {
-      if (val.fCost < acc.fCost) return val;
-
-      return acc;
-    }, array[0]);
-
-    return lowest;
-  }
-
-  getMostPromissingItem(array)
-  {
-    let result = array[0];
-    for (let i = 1; i < array.length - 1; i++)
-    {
-      const node = array[i];
-      if (node.fCost < result.fCost || node.fCost === result.fCost && node.hCost > result.hCost)
-      {
-        result = node;
-      }
-    };
-
-    return result;
-  }
-
   aStar()
   {
     if (!this.origin || !this.target) return;
@@ -225,10 +201,10 @@ class Grid
     
     this.reset();
 
-    let frontier = [];
+    let frontier = new heapTree();
     origin.gCost = 0;
     origin.fCost = origin.get_fCost(target);
-    frontier.push(origin);
+    frontier.add(origin);
 
     this.isPerformingPathfinding = true;
 
@@ -244,8 +220,7 @@ class Grid
 
   aStarLoop(frontier, origin, target, startTime)
   {
-    // let current = this.getMostPromissingItem(frontier);
-    let current = this.getItemWithLowestFCost(frontier);
+    let current = frontier.pullOutLowest();
     
     if (!current)
     {
@@ -272,13 +247,11 @@ class Grid
     }
 
     current.wasVisisted = true;
-    frontier = frontier.filter(node => !node.isEqualTo(current));
 
     this.getNeighbours(current).forEach(neighbour => {
-      const isntInFrontier = frontier.every(node => !node.isEqualTo(neighbour));
-      if (isntInFrontier)
+      if (!frontier.isItemInTheTree(neighbour))
       {
-        frontier.push(neighbour);
+        frontier.add(neighbour);
         neighbour.gCost = current.gCost + 1;
         const new_fCost = neighbour.get_fCost(target);
         if (neighbour.fCost === null || new_fCost < neighbour.fCost)
@@ -290,7 +263,7 @@ class Grid
       };
     });
 
-    if (frontier.length > 0)
+    if (frontier.getLength() > 0)
     {
       if (this.isRuntime) this.aStarLoop(frontier, origin, target, startTime)
       else this.aStarLoopDelayed(frontier, origin, target, startTime);
@@ -304,7 +277,7 @@ class Grid
   aStarLoopDelayed(frontier, origin, target, startTime)
   {
     setTimeout(() => {
-      if (frontier.length > 0) this.aStarLoop(frontier, origin, target, startTime)
+      if (frontier.getLength() > 0) this.aStarLoop(frontier, origin, target, startTime)
       else this.isPerformingPathfinding = false;
     }, this.delay);
   }

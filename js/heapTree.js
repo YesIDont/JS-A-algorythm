@@ -57,7 +57,7 @@ class heapTree {
     while(shouldKeepSearching)
     {
       const parentItem = this.items[parentIndex];
-      if (parentItem && this._compareItems(item, parentItem))
+      if (parentItem && this._compareItems(item, parentItem) > 0)
       {
         this._swap(item, parentItem);
       }

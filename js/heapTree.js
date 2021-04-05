@@ -25,7 +25,7 @@ class heapTree {
     return firstItem;
   }
 
-  isItemInTheTree(item)
+  hasItem(item)
   {
     return this.items.some(i => i.isEqualTo(item));
   }

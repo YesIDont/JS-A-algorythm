@@ -58,8 +58,8 @@ class Grid
     }
     else
     {
-      this.setOrigin(this.nodes[this.width - 1][0]);
-      this.setTarget(this.nodes[0][this.height - 1]);
+      this.setOrigin(this.nodes[height - 1][0]);
+      this.setTarget(this.nodes[0][width - 1]);
     }
   }
 
@@ -73,12 +73,12 @@ class Grid
 
     for (r; r < rows; r++)
     {
-      canvas.drawLine(0, r * size, columns * size, r * size, '#d1d1d1');
+      canvas.drawLine(r * size, 0, r * size, columns * size, '#d1d1d1');
     }
 
     for (c; c < columns; c++)
     {
-      canvas.drawLine(c * size, 0, c * size, rows * size, '#d1d1d1');
+      canvas.drawLine(0, c * size, rows * size, c * size, '#d1d1d1');
     }
     
   }

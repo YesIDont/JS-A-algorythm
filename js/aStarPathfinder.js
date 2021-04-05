@@ -56,7 +56,7 @@ class AStarPathfinder
 
   _logPathTimeAndLenght(time, length)
   {
-    console.log(`A* Algorithm found path in: ${time} ms. The path length is: ${length}`);
+    alert(`A* Algorithm found path in: ${time} ms. The path length is: ${length}`);
   }
 
   _searchSetup(origin, target, stepByStep = false)
@@ -94,7 +94,7 @@ class AStarPathfinder
     current.wasVisisted = true;
 
     this.grid.getNeighbours(current).forEach(neighbour => {
-      if (!this.openSet.isItemInTheTree(neighbour))
+      if (!this.openSet.hasItem(neighbour))
       {
         this.openSet.add(neighbour);
         neighbour.gCost = current.gCost + 1; // current.getWeightedDistanceTo(neighbour);

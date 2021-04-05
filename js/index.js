@@ -2,16 +2,21 @@ let grid, pathfinder;
 
 window.addEventListener('load', () => {
 
+  canvas.updateSize();
+
   let isPathfindingBlocked = false;
   let refNode = null;
+  const size = 10;
 
   grid = new Grid({
-    width: 256,
-    height: 256,
-    nodeSize: 3,
-    obstaclesDensity: 300,
+    width: Math.floor(canvas.height / size),
+    height: Math.floor(canvas.width / size),
+    // width: 128,
+    // height: 128,
+    nodeSize: size,
+    obstaclesDensity: 10,
     mode: 'walls',
-    isRuntime: true,
+    // isRuntime: true,
     randomOriginAndTarget: false,
     // loadDummyMap: true,
   });

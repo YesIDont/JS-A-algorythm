@@ -24,8 +24,8 @@ class AStarPathfinder
       if (this.pathIsFound)
       {
         path = this._tracePathBackToOrigin(origin, target);
-        this._logPathTimeAndLenght(Date.now() - startTime, path.length);
       }
+      this._logPathTimeAndLenght(Date.now() - startTime, path.length);
 
       usePathCallback(path);
       this.isSerching = false;
@@ -56,7 +56,13 @@ class AStarPathfinder
 
   _logPathTimeAndLenght(time, length)
   {
-    alert(`A* Algorithm found path in: ${time} ms. The path length is: ${length}`);
+    if (this.pathIsFound)
+    {
+      console.log(`Found path in: ${time} ms, length: ${length}`);
+      return;
+    }
+
+    console.log(`Could not find the path :/`);
   }
 
   _searchSetup(origin, target, stepByStep = false)

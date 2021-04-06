@@ -2,17 +2,17 @@ class Grid
 {
   constructor({
     height = 64,
-    isRuntime = false,
-    loadDummyMap = false,
-    mode = 'random',
-    obstaclesDensity = 10,
-    randomOriginAndTarget = true,
+    dummyMap,
+    makeWals = false,
+    wallsDensity = 0,
+    obstaclesDensity = 0,
+    makeRandomObstacles = false,
+    randomOriginAndTarget = false,
     nodeSize = 8,
     width = 64,
   })
   {
     this.height = height;
-    this.isRuntime = isRuntime;
     this.neighbourAddressMods = [[0, -1], [1, 0], [0, 1], [-1, 0]];
     this.nodes = [[]];
     this.nodeSize = nodeSize;
@@ -22,39 +22,19 @@ class Grid
     this.target = null;
     this.width = width;
 
-    const hasWalls = mode === 'walls';
-
-    let idCounter = 0;
-    if (loadDummyMap)
+    if (dummyMap)
     {
-      this.nodes = dummyMap.map(row => row.map(node => {
-        const copy = new Node(node.x, node.y, nodeSize, node.isObstacle, idCounter);
-        idCounter++;
-
-        return copy;
-      }));
+      this._loadSavedMap(dummyMap);
     }
     else
     {
-      for (let row = 0; row < height; row++)
-      {
-        this.nodes[row] = [];
-        for (let column = 0; column < width; column++)
-        {
-          this.nodes[row][column] = new Node(row, column, nodeSize, hasWalls ? 0 : dice100(obstaclesDensity), idCounter);
-          idCounter++;
-        }
-      };
+      if (makeRandomObstacles) this._generateMap(obstaclesDensity);
+      if (makeWals) doNTimes(wallsDensity * wallsDensity, () => { this._makeRandomWall(wallsDensity * 1.5); });
     };
-    
-    if (hasWalls)
-    {
-      doNTimes((width * nodeSize) * obstaclesDensity, () => { this.makeRandomWall(); });
-    }
 
     if (this.randomOriginAndTarget)
     {
-      this.setRandomOriginAndTarget();
+      this._setRandomOriginAndTarget();
     }
     else
     {
@@ -97,14 +77,6 @@ class Grid
     });
   }
 
-  getRandomNode()
-  {
-    const row = getRandomFromRange(0, this.height - 1, true);
-    const column = getRandomFromRange(0, this.width - 1, true);
-
-    return this.nodes[row][column];
-  }
-
   setOrigin(origin)
   {
     this.origin = origin;
@@ -119,16 +91,6 @@ class Grid
     this.target.isObstacle = false;
   }
 
-  setRandomOriginAndTarget()
-  {
-    this.origin = this.getRandomNode();
-    this.origin.isObstacle = false;
-    this.origin.color = '#0055FF';
-    this.target = this.getRandomNode();
-    this.target.isObstacle = false;
-    this.target.color = '#FF0000';
-  }
-
   getNodeUnderPointer(point)
   {
     const row = Math.floor(point.y / this.nodeSize);
@@ -140,37 +102,6 @@ class Grid
     }
 
     return null;
-  }
-
-  makeWall(start, end, clearWallChance = 0)
-  {
-    let min, max;
-    const isHorizontal = start.y === end.y;
-    const mod = isHorizontal ? 'x' : 'y';
-    min = Math.min(start[mod], end[mod]);
-    max = Math.max(start[mod], end[mod]);
-    const isClearWall = dice100(clearWallChance);
-    for (let i = min; i <= max; i++ )
-    {
-      const x = isHorizontal ? i : start.x;
-      const y = isHorizontal ? start.y : i;
-      if (this.nodes[x] && this.nodes[x][y])
-      {
-        const node = this.nodes[x][y];
-        node.setAsObstacle();
-        if (isClearWall) node.setAsNonObstacle();
-      }
-    }
-  }
-
-  makeRandomWall(clearWallChance = 70)
-  {
-    const start = this.getRandomNode();
-    const end = start.getCopy();
-    const mod = flipCoin() ? 'x' : 'y';
-    const size = getRandomFromRange(0, mod === 'x' ? this.width : this.height);
-    end[mod] += getRandomFromRange(-size, size);
-    this.makeWall(start, end, clearWallChance);
   }
 
   getNeighbours(refNode)
@@ -193,6 +124,82 @@ class Grid
     });
 
     return neighbours;
+  }
+
+  _generateMap(obstaclesDensity)
+  {
+    this.nodes = [];
+    let idCounter = 0;
+    for (let row = 0; row < this.height; row++)
+    {
+      this.nodes[row] = [];
+      for (let column = 0; column < this.width; column++)
+      {
+        this.nodes[row][column] = new Node(row, column, this.nodeSize, dice100(obstaclesDensity), idCounter);
+        idCounter++;
+      }
+    };
+  }
+
+  _loadSavedMap(map)
+  {
+    this.nodes = [];
+    let idCounter = 0;
+    this.nodes = map.map(row => row.map(node => {
+      const copy = new Node(node.x, node.y, this.nodeSize, node.isObstacle, idCounter);
+      idCounter++;
+
+      return copy;
+    }));
+  }
+
+  _getRandomNode()
+  {
+    const row = getRandomFromRange(0, this.height - 1, true);
+    const column = getRandomFromRange(0, this.width - 1, true);
+
+    return this.nodes[row][column];
+  }
+
+  _setRandomOriginAndTarget()
+  {
+    this.origin = this._getRandomNode();
+    this.origin.isObstacle = false;
+    this.origin.color = '#0055FF';
+    this.target = this._getRandomNode();
+    this.target.isObstacle = false;
+    this.target.color = '#FF0000';
+  }
+
+  _makeWall(start, end, clearWallChance = 0)
+  {
+    let min, max;
+    const isHorizontal = start.y === end.y;
+    const mod = isHorizontal ? 'x' : 'y';
+    min = Math.min(start[mod], end[mod]);
+    max = Math.max(start[mod], end[mod]);
+    const isClearWall = dice100(clearWallChance);
+    for (let i = min; i <= max; i++ )
+    {
+      const x = isHorizontal ? i : start.x;
+      const y = isHorizontal ? start.y : i;
+      if (this.nodes[x] && this.nodes[x][y])
+      {
+        const node = this.nodes[x][y];
+        node.setAsObstacle();
+        if (isClearWall) node.setAsNonObstacle();
+      }
+    }
+  }
+
+  _makeRandomWall(clearWallChance = 0)
+  {
+    const start = this._getRandomNode();
+    const end = start.getCopy();
+    const mod = flipCoin() ? 'x' : 'y';
+    const size = getRandomFromRange(0, mod === 'x' ? this.width : this.height);
+    end[mod] += getRandomFromRange(-size, size);
+    this._makeWall(start, end, clearWallChance);
   }
 
   reset()

@@ -6,7 +6,8 @@ window.addEventListener('load', () => {
 
   let isPathfindingBlocked = false;
   let refNode = null;
-  const size = 10;
+  const size = 12;
+  const stepByStepSearch = true;
 
   grid = new Grid({
     width: Math.floor(canvas.height / size),
@@ -14,16 +15,17 @@ window.addEventListener('load', () => {
     // width: 128,
     // height: 128,
     nodeSize: size,
-    obstaclesDensity: 10,
-    mode: 'walls',
-    // isRuntime: true,
-    randomOriginAndTarget: false,
-    // loadDummyMap: true,
+    obstaclesDensity: 0,
+    makeRandomObstacles: true,
+    makeWals: true,
+    wallsDensity: 40,
+    // randomOriginAndTarget: true,
+    // dummyMap,
   });
 
   pathfinder = new AStarPathfinder({ gridReference: grid });
 
-  if (grid.isRuntime)
+  if (!stepByStepSearch)
   {
     document.addEventListener('mousemove', ({ target }) => {
       if (target.id === 'canvas')
@@ -72,7 +74,7 @@ window.addEventListener('load', () => {
   function frame()
   {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (grid.isRuntime && !pathfinder.isSerching && !isPathfindingBlocked)
+    if (!stepByStepSearch && !pathfinder.isSerching && !isPathfindingBlocked)
     {
       pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
       isPathfindingBlocked = true;
@@ -84,6 +86,6 @@ window.addEventListener('load', () => {
   }
 
   frame();
-  if (!grid.isRuntime) pathfinder.findPathStepByStep(grid.origin, grid.target, (path) => { grid.path = path; });
+  if (stepByStepSearch) pathfinder.findPathStepByStep(grid.origin, grid.target, (path) => { grid.path = path; });
 
 });

@@ -1,21 +1,31 @@
+let grid, pathfinder;
+
 window.addEventListener('load', () => {
+
+  canvas.updateSize();
 
   let isPathfindingBlocked = false;
   let refNode = null;
+  const size = 12;
+  const stepByStepSearch = true;
 
-  const grid = new Grid({
-    // width: 256,
-    // height: 256,
-    // size: 4,
+  grid = new Grid({
+    width: Math.floor(canvas.height / size),
+    height: Math.floor(canvas.width / size),
+    // width: 128,
+    // height: 128,
+    nodeSize: size,
     obstaclesDensity: 0,
-    // mode: 'walls',
-    // delay: 100,
-    isRuntime: true,
-    randomOriginAndTarget: false,
-    // loadDummyMap: true,
+    makeRandomObstacles: true,
+    makeWals: true,
+    wallsDensity: 40,
+    // randomOriginAndTarget: true,
+    // dummyMap,
   });
 
-  if (grid.isRuntime)
+  pathfinder = new AStarPathfinder({ gridReference: grid });
+
+  if (!stepByStepSearch)
   {
     document.addEventListener('mousemove', ({ target }) => {
       if (target.id === 'canvas')
@@ -64,16 +74,18 @@ window.addEventListener('load', () => {
   function frame()
   {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (!grid.isPerformingPathfinding && !isPathfindingBlocked)
+    if (!stepByStepSearch && !pathfinder.isSerching && !isPathfindingBlocked)
     {
-      grid.aStar();
+      pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
       isPathfindingBlocked = true;
     }
+    grid.drawGrid();
     grid.drawNodes();
     fillCircle(ctx, mouse, 3);
     requestAnimationFrame(frame);
   }
 
   frame();
+  if (stepByStepSearch) pathfinder.findPathStepByStep(grid.origin, grid.target, (path) => { grid.path = path; });
 
 });

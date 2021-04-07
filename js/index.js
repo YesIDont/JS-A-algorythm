@@ -7,7 +7,7 @@ window.addEventListener('load', () => {
   let isPathfindingBlocked = false;
   let refNode = null;
   const size = 12;
-  const stepByStepSearch = true;
+  const stepByStepSearch = false;
 
   grid = new Grid({
     width: Math.floor(canvas.height / size),
@@ -17,7 +17,7 @@ window.addEventListener('load', () => {
     nodeSize: size,
     obstaclesDensity: 0,
     makeRandomObstacles: true,
-    makeWals: true,
+    // makeWals: true,
     wallsDensity: 40,
     // randomOriginAndTarget: true,
     // dummyMap,

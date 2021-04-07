@@ -24,20 +24,6 @@ class Node
     return this.id == other.id;
   }
 
-  compare_fCostTo(B)
-  {
-    if (this.fCost < B.fCost) return -1;
-    if (this.fCost === B.fCost) return 0;
-    return 1;
-  }
-
-  compare_hCostTo(B)
-  {
-    if (this.hCost < B.hCost) return -1;
-    if (this.hCost === B.hCost) return 0;
-    return 1;
-  }
-
   getStamp()
   {
     return this.x + this.y;
@@ -54,15 +40,12 @@ class Node
   get_fCost(target)
   {
     return this.gCost + this.getEuclideanDistance(target);
-    // return this.gCost + this.getManhatanDistanceTo(target);
-    // return this.gCost + this.getWeightedDistanceTo(target);
   }
 
   set_fCost(target)
   {
-    this.fCost = this.gCost + this.getEuclideanDistance(target);
-    // this.fCost = this.gCost + this.getManhatanDistanceTo(target);
-    // this.fCost = this.gCost + this.getWeightedDistanceTo(target);
+    this.fCost = this.get_fCost(target);
+
     return this.fCost;
   }
 

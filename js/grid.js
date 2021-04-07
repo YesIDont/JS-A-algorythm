@@ -1,15 +1,13 @@
 class Grid
 {
   constructor({
-    height = 64,
+    height = 32,
     dummyMap,
-    makeWals = false,
     wallsDensity = 0,
     obstaclesDensity = 0,
-    makeRandomObstacles = false,
     randomOriginAndTarget = false,
     nodeSize = 8,
-    width = 64,
+    width = 32,
   })
   {
     this.height = height;
@@ -18,7 +16,6 @@ class Grid
     this.nodeSize = nodeSize;
     this.origin = null;
     this.path = [];
-    this.randomOriginAndTarget = randomOriginAndTarget;
     this.target = null;
     this.width = width;
 
@@ -28,18 +25,17 @@ class Grid
     }
     else
     {
-      if (makeRandomObstacles) this._generateMap(obstaclesDensity);
-      if (makeWals) doNTimes(wallsDensity * wallsDensity, () => { this._makeRandomWall(wallsDensity * 1.5); });
+      this.generate({ obstaclesDensity, wallsDensity, nodeSize });
     };
 
-    if (this.randomOriginAndTarget)
+    if (randomOriginAndTarget)
     {
-      this._setRandomOriginAndTarget();
+      this.setRandomOriginAndTarget();
     }
     else
     {
-      this.setOrigin(this.nodes[height - 1][0]);
-      this.setTarget(this.nodes[0][width - 1]);
+      this.setOrigin(this.nodes[width - 1][0]);
+      this.setTarget(this.nodes[0][height - 1]);
     }
   }
 
@@ -91,10 +87,10 @@ class Grid
     this.target.isObstacle = false;
   }
 
-  getNodeUnderPointer(point)
+  getNodeUnderPointer(x, y)
   {
-    const row = Math.floor(point.y / this.nodeSize);
-    const column = Math.floor(point.x / this.nodeSize);
+    const row = Math.floor(y / this.nodeSize);
+    const column = Math.floor(x / this.nodeSize);
     
     if (this.nodes[column] && this.nodes[column][row])
     {
@@ -126,19 +122,33 @@ class Grid
     return neighbours;
   }
 
-  _generateMap(obstaclesDensity)
+  generate({ obstaclesDensity = 0, wallsDensity = 0, cellsHorizontally, cellsVertically, nodeSize })
   {
+    const width = cellsHorizontally || this.width;
+    const height = cellsVertically || this.height;
+    const size = nodeSize || this.nodeSize;
     this.nodes = [];
     let idCounter = 0;
-    for (let row = 0; row < this.height; row++)
+    for (let x = 0; x < width; x++)
     {
-      this.nodes[row] = [];
-      for (let column = 0; column < this.width; column++)
+      this.nodes[x] = [];
+      for (let y = 0; y < height; y++)
       {
-        this.nodes[row][column] = new Node(row, column, this.nodeSize, dice100(obstaclesDensity), idCounter);
+        this.nodes[x][y] = new Node(x, y, size, dice100(obstaclesDensity), idCounter);
         idCounter++;
       }
     };
+    if (wallsDensity > 0) doNTimes(wallsDensity * wallsDensity, () => { this._makeRandomWall(wallsDensity * 1.5); });
+  }
+
+  setRandomOriginAndTarget()
+  {
+    this.origin = this._getRandomNode();
+    this.origin.isObstacle = false;
+    this.origin.color = '#0055FF';
+    this.target = this._getRandomNode();
+    this.target.isObstacle = false;
+    this.target.color = '#00DD00';
   }
 
   _loadSavedMap(map)
@@ -158,17 +168,7 @@ class Grid
     const row = getRandomFromRange(0, this.height - 1, true);
     const column = getRandomFromRange(0, this.width - 1, true);
 
-    return this.nodes[row][column];
-  }
-
-  _setRandomOriginAndTarget()
-  {
-    this.origin = this._getRandomNode();
-    this.origin.isObstacle = false;
-    this.origin.color = '#0055FF';
-    this.target = this._getRandomNode();
-    this.target.isObstacle = false;
-    this.target.color = '#FF0000';
+    return this.nodes[column][row];
   }
 
   _makeWall(start, end, clearWallChance = 0)
@@ -202,7 +202,7 @@ class Grid
     this._makeWall(start, end, clearWallChance);
   }
 
-  reset()
+  reset(shouldKeepOriginAndTarget)
   {
     this.nodes.forEach(row => {
       row.forEach(node => {
@@ -212,7 +212,14 @@ class Grid
           node.gCost = null;
           node.hCost = null;
           node.fCost = null;
-          if (!node.isEqualTo(this.origin) && !node.isEqualTo(this.target)) node.color = 'transparent';
+          if (shouldKeepOriginAndTarget)
+          {
+            if (!node.isEqualTo(this.origin) && !node.isEqualTo(this.target)) node.color = 'transparent';
+          }
+          else
+          {
+            node.color = 'transparent';
+          }
         }
       });
     });

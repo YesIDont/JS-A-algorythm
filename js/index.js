@@ -4,33 +4,64 @@ window.addEventListener('load', () => {
 
   canvas.updateSize();
 
-  let isPathfindingBlocked = false;
   let refNode = null;
-  const size = 4;
-  const stepByStepSearch = false;
+  let isContinuousSearchOn = true;
+  let isRandomOriginAndTargetOn = false;
+  const size = 10;
 
   grid = new Grid({
-    width: Math.floor(canvas.height / size),
-    height: Math.floor(canvas.width / size),
+    width: Math.floor(canvas.width / size),
+    height: Math.floor(canvas.height / size),
     // width: 128,
     // height: 128,
     nodeSize: size,
-    obstaclesDensity: 0,
-    makeRandomObstacles: true,
-    // makeWals: true,
+    // obstaclesDensity: 30,
     wallsDensity: 30,
     // randomOriginAndTarget: true,
     // dummyMap,
   });
 
   pathfinder = new AStarPathfinder({ grid });
+  
+  continuousSearchSwitch.onchange = ({ target, key }) => {
+    isContinuousSearchOn = target.checked;
+  };
 
-  if (!stepByStepSearch)
-  {
-    document.addEventListener('mousemove', ({ target }) => {
-      if (target.id === 'canvas')
+  document.addEventListener('keydown', ({ key }) => {
+    if (key === 'c') 
+    {
+      const continuous = !continuousSearchSwitch.checked;
+      continuousSearchSwitch.checked = continuous;
+      isContinuousSearchOn = continuous;
+    }
+  });
+  
+  randomOriginAndTargetSwitch.onchange = ({ target }) => {
+    isRandomOriginAndTargetOn = target.checked;
+  };
+
+  stepByStepSwitch.onchange = ({ target }) => {
+    pathfinder.stepByStep = target.checked;
+  };
+
+  runSingleSearchButton.onclick = () => {
+    if (isRandomOriginAndTargetOn) grid.setRandomOriginAndTarget();
+    if (pathfinder.stepByStep)
+    {
+      pathfinder.findPathStepByStep(grid.origin, grid.target, (path) => { grid.path = path; });
+
+      return;
+    }
+    pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
+  };
+
+  document.addEventListener('mousemove', ({ target }) => {
+    if (isContinuousSearchOn)
+    {
+      const node = grid.getNodeUnderPointer(mouse.x, mouse.y - 25);
+      if (target.id === canvas.id && node)
       {
-        const node = grid.getNodeUnderPointer(mouse);
+        pathfinder.searchIsLocked = false;
   
         if (node)
         {
@@ -47,24 +78,26 @@ window.addEventListener('load', () => {
           }
           else
           {
-            if (!node.isObstacle) {
+            if (!node.isObstacle && !pathfinder.isSearching && !node.isEqualTo(grid.target) && !pathfinder.searchIsLocked) {
               grid.setTarget(node);
+              pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
             };
           }
         }
+        return;
       };
-      isPathfindingBlocked = false;
-    });
-  
-    document.addEventListener('mousedown', ({ target }) => {
-      mouse.isLeftDown = true;
-      const node = grid.getNodeUnderPointer(mouse);
-      if (target.id === 'canvas' && node)
-      {
-        refNode = node;
-      }
-    });
-  }
+      pathfinder.searchIsLocked = true;
+    }
+  });
+
+  document.addEventListener('mousedown', ({ target }) => {
+    mouse.isLeftDown = true;
+    const node = grid.getNodeUnderPointer(mouse);
+    if (target.id === 'canvas' && node)
+    {
+      refNode = node;
+    }
+  });
 
 
   document.addEventListener('mouseup', () => {
@@ -74,18 +107,11 @@ window.addEventListener('load', () => {
   function frame()
   {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (!stepByStepSearch && !pathfinder.isSerching && !isPathfindingBlocked)
-    {
-      pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
-      isPathfindingBlocked = true;
-    }
     grid.drawGrid();
     grid.drawNodes();
-    fillCircle(ctx, mouse, 3);
+    fillCircle(ctx, { x: mouse.x, y: mouse.y - 25 }, 3);
     requestAnimationFrame(frame);
   }
 
   frame();
-  if (stepByStepSearch) pathfinder.findPathStepByStep(grid.origin, grid.target, (path) => { grid.path = path; });
-
 });

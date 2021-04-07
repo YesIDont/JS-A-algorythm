@@ -1,8 +1,8 @@
 class AStarPathfinder
 {
-  constructor({ gridReference, stepDelay = 0 })
+  constructor({ grid, stepDelay = 0 })
   {
-    this.grid = gridReference;
+    this.grid = grid;
     this.openSet = new heapTree();
     this.stepDelay = stepDelay;
     this.pathIsFound = false;
@@ -75,7 +75,7 @@ class AStarPathfinder
     origin.gCost = 0;
     origin.fCost = origin.get_fCost(target);
     this.openSet.reset();
-    this.openSet.add(origin);
+    this.openSet.push(origin);
 
     return startTime;
   }
@@ -99,17 +99,18 @@ class AStarPathfinder
 
     current.wasVisisted = true;
 
-    this.grid.getNeighbours(current).forEach(neighbour => {
-      if (!this.openSet.hasItem(neighbour))
+    this.grid.getNeighbours(current).forEach(node => {
+      const new_gCost = current.gCost + 1;
+      const isNodeNotInOpen = !this.openSet.hasItem(node);
+      if (isNodeNotInOpen || new_gCost < node.gCost)
       {
-        this.openSet.add(neighbour);
-        neighbour.gCost = current.gCost + 1; // current.getWeightedDistanceTo(neighbour);
-        const new_fCost = neighbour.get_fCost(target);
-        if (neighbour.fCost === null || new_fCost < neighbour.fCost)
+        node.gCost = new_gCost;
+        node.set_fCost(target);
+        node.parent = current;
+        if (isNodeNotInOpen)
         {
-          neighbour.fCost = new_fCost;
-          neighbour.parent = current;
-          if (stepByStep) neighbour.color = '#ff9900';
+          this.openSet.push(node);
+          if (stepByStep) node.color = '#ff9900';
         }
       };
     });

@@ -45,8 +45,6 @@ class Node
   set_fCost(target)
   {
     this.fCost = this.get_fCost(target);
-
-    return this.fCost;
   }
 
   getCoordiatesDifference(other)

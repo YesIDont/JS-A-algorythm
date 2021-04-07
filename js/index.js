@@ -6,7 +6,7 @@ window.addEventListener('load', () => {
 
   let isPathfindingBlocked = false;
   let refNode = null;
-  const size = 12;
+  const size = 4;
   const stepByStepSearch = false;
 
   grid = new Grid({
@@ -18,12 +18,12 @@ window.addEventListener('load', () => {
     obstaclesDensity: 0,
     makeRandomObstacles: true,
     // makeWals: true,
-    wallsDensity: 40,
+    wallsDensity: 30,
     // randomOriginAndTarget: true,
     // dummyMap,
   });
 
-  pathfinder = new AStarPathfinder({ gridReference: grid });
+  pathfinder = new AStarPathfinder({ grid });
 
   if (!stepByStepSearch)
   {

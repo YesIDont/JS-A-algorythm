@@ -5,7 +5,7 @@ class heapTree {
     this.currentItemCount = 0;
   }
 
-  add(item)
+  push(item)
   {
     item.heapIndex = this.currentItemCount;
     this.items[this.currentItemCount] = item;
@@ -51,16 +51,17 @@ class heapTree {
   _compareItems(A, B)
   {
     let compare = this._compareNumbers(A.fCost, B.fCost);
-    if (compare == 0) compare = this._compareNumbers(A.hCost, B.hCost)
+    // if (compare == 0) compare = this._compareNumbers(A.hCost, B.hCost);
 
     return -compare;
   }
 
   _getParentIndex(itemIndex)
   {
-    let parentIndex = Math.floor(itemIndex - 1) * 0.5;
+    let parentIndex = Math.floor((itemIndex - 1) * 0.5);
+    if (parentIndex < 0) return 0;
 
-    return parentIndex < 0 ? 0 : parentIndex;
+    return parentIndex;
   }
 
   _sortUp(item)

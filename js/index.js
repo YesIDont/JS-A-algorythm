@@ -7,7 +7,7 @@ window.addEventListener('load', () => {
   let refNode = null;
   let isContinuousSearchOn = true;
   let isRandomOriginAndTargetOn = false;
-  const size = 10;
+  const size = 8;
 
   grid = new Grid({
     width: Math.floor(canvas.width / size),
@@ -16,7 +16,7 @@ window.addEventListener('load', () => {
     // height: 128,
     nodeSize: size,
     // obstaclesDensity: 30,
-    wallsDensity: 30,
+    wallsDensity: 15,
     // randomOriginAndTarget: true,
     // dummyMap,
   });
@@ -45,13 +45,20 @@ window.addEventListener('load', () => {
   };
 
   runSingleSearchButton.onclick = () => {
-    if (isRandomOriginAndTargetOn) grid.setRandomOriginAndTarget();
     if (pathfinder.stepByStep)
     {
-      pathfinder.findPathStepByStep(grid.origin, grid.target, (path) => { grid.path = path; });
-
+      if (pathfinder.isSearching) pathfinder.shouldBreake = true;
+      waitFor(
+        () => pathfinder.isSearching === false && pathfinder.shouldBreake === false,
+        () => {
+          if (isRandomOriginAndTargetOn) grid.setRandomOriginAndTarget();
+          pathfinder.findPathStepByStep(grid.origin, grid.target, (path) => { grid.path = path; });
+        },
+      );
+      
       return;
     }
+    if (isRandomOriginAndTargetOn) grid.setRandomOriginAndTarget();
     pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
   };
 

@@ -62,6 +62,20 @@ function wait(timeToWait, callback)
     if (callback) callback();
 };
 
+function waitFor(conditionCheck, callback, interval = 0)
+{
+  if (conditionCheck())
+  {
+    callback();
+  }
+  else
+  {
+    setTimeout(() => {
+      waitFor(conditionCheck, callback, interval);
+    }, interval);
+  }
+};
+
 function doNTimes(n, callback)
 {
   for (let i = 0; i < n; i++)

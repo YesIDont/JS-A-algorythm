@@ -15,12 +15,15 @@ class heapTree {
 
   pullOutTheLowest()
   {
-    const firstItem = this.items[0];
-    this.currentItemCount--;
-    this.items[0] = this.items[this.currentItemCount];
-    if (!this.items[0]) return undefined;
-    this.items[0].heapIndex = 0;
-    this._sortDown(this.items[0]);
+    const firstItem = this.items.shift();
+    if (this.items.length > 0)
+    {
+      const last = this.items.pop();
+      this.items.unshift(last);
+      this.items[0].heapIndex = 0;
+      if (this.items.length > 1) this._sortDown(this.items[0]);
+    }
+    this.currentItemCount -= 1;
 
     return firstItem;
   }
@@ -105,7 +108,7 @@ class heapTree {
         }
 
         const potential = this.items[swapIndex];
-        if (this._compareItems(item, potential) < 0)
+        if (potential && this._compareItems(item, potential) < 0)
         {
           this._swap(item, potential);
         }

@@ -1,14 +1,14 @@
 class AStarPathfinder
 {
-  constructor({ grid, stepDelay = 0, stepByStep = false })
-  {
+  constructor({ grid, stepDelay = 0, stepByStep = false }) {
     this.grid = grid;
     this.openSet = new heapTree();
     this.stepDelay = stepDelay;
+    this.stepByStep = stepByStep;
     this.pathIsFound = false;
     this.isSearching = false;
     this.searchIsLocked = false;
-    this.stepByStep = stepByStep;
+    this.shouldBreake = false;
   }
 
   findPath(origin, target, usePathCallback)
@@ -27,10 +27,7 @@ class AStarPathfinder
       {
         path = this._tracePathBackToOrigin(origin, target);
       }
-      this._logPathTimeAndLenght(Date.now() - startTime, path.length);
-
-      usePathCallback(path);
-      this.isSearching = false;
+      this._finalizeSearch(startTime, path, usePathCallback);
     }
   }
 
@@ -44,28 +41,13 @@ class AStarPathfinder
         const path = await new Promise((resolve) => {
           this._loopDelayed(origin, target, resolve);
         });
-        this._logPathTimeAndLenght(Date.now() - startTime, path.length);
-        usePathCallback(path);
-        this.isSearching = false;
+        this._finalizeSearch(startTime, path, usePathCallback);
       }
       catch (error)
       {
         console.log(error);
-
-        return [];
       }
     }
-  }
-
-  _logPathTimeAndLenght(time, length)
-  {
-    if (this.pathIsFound)
-    {
-      console.log(`Found path in: ${time} ms, length: ${length}`);
-      return;
-    }
-
-    console.log(`Could not find the path :/`);
   }
 
   _searchSetup(origin, target)
@@ -83,8 +65,28 @@ class AStarPathfinder
     return startTime;
   }
 
-  _searchLoop(origin, target)
+  _logPathTimeAndLenght(time, length)
   {
+    if (this.pathIsFound)
+    {
+      console.log(`Found path in: ${time} ms, length: ${length}`);
+      return;
+    }
+
+    console.log(`Could not find the path :/`);
+  }
+
+  _finalizeSearch(startTime, path, usePathCallback)
+  {
+    const length = path.length;
+    this._logPathTimeAndLenght(Date.now() - startTime, length);
+    if (length) usePathCallback(path);
+    this.isSearching = false;
+    this.shouldBreake = false;
+  }
+
+  _searchLoop(origin, target)
+  {log(target.id)
     let current = this.openSet.pullOutTheLowest();
 
     if (!current || !origin || !target) return false;
@@ -104,13 +106,13 @@ class AStarPathfinder
 
     this.grid.getNeighbours(current).forEach(node => {
       const new_gCost = current.gCost + 1;
-      const isNodeNotInOpen = !this.openSet.hasItem(node);
-      if (isNodeNotInOpen || new_gCost < node.gCost)
+      const isNodeNOTInOpen = !this.openSet.hasItem(node);
+      if (isNodeNOTInOpen || new_gCost < node.gCost)
       {
         node.gCost = new_gCost;
         node.set_fCost(target);
         node.parent = current;
-        if (isNodeNotInOpen)
+        if (isNodeNOTInOpen)
         {
           this.openSet.push(node);
           if (this.stepByStep && !node.isEqualTo(target)) node.color = '#ff9900';
@@ -123,6 +125,7 @@ class AStarPathfinder
 
   _loopDelayed(origin, target, resolve)
   {
+    if (this.shouldBreake) return resolve([]);
     setTimeout(() => {
 
       if (this._searchLoop(origin, target, true))

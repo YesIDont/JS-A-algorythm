@@ -54,7 +54,7 @@ class heapTree {
   _compareItems(A, B)
   {
     let compare = this._compareNumbers(A.fCost, B.fCost);
-    // if (compare == 0) compare = this._compareNumbers(A.hCost, B.hCost);
+    if (compare == 0) compare = this._compareNumbers(A.hCost, B.hCost);
 
     return -compare;
   }

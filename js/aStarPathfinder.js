@@ -86,7 +86,7 @@ class AStarPathfinder
   }
 
   _searchLoop(origin, target)
-  {log(target.id)
+  {
     let current = this.openSet.pullOutTheLowest();
 
     if (!current || !origin || !target) return false;

@@ -45,21 +45,21 @@ window.addEventListener('load', () => {
   };
 
   runSingleSearchButton.onclick = () => {
-    if (pathfinder.stepByStep)
-    {
       if (pathfinder.isSearching) pathfinder.shouldBreake = true;
       waitFor(
         () => pathfinder.isSearching === false && pathfinder.shouldBreake === false,
         () => {
           if (isRandomOriginAndTargetOn) grid.setRandomOriginAndTarget();
-          pathfinder.findPathStepByStep(grid.origin, grid.target, (path) => { grid.path = path; });
+          if (pathfinder.stepByStep)
+          {
+            pathfinder.findPathStepByStep(grid.origin, grid.target, (path) => { grid.path = path; });
+          }
+          else
+          {
+            pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
+          }
         },
       );
-      
-      return;
-    }
-    if (isRandomOriginAndTargetOn) grid.setRandomOriginAndTarget();
-    pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
   };
 
   document.addEventListener('mousemove', ({ target }) => {

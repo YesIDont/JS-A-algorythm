@@ -58,7 +58,7 @@ class AStarPathfinder
     this.grid.reset(true);
     const startTime = Date.now();
     origin.gCost = 0;
-    origin.fCost = origin.get_fCost(target);
+    origin.fCost = origin.gCost + origin.getEuclideanDistance(target);
     this.openSet.reset();
     this.openSet.push(origin);
 
@@ -91,13 +91,13 @@ class AStarPathfinder
 
     if (!current || !origin || !target) return false;
     
-    if (current.isEqualTo(target))
+    if (current.id === target.id)
     {
       this.pathIsFound = true;
 
       return false;
     }
-    else if (this.stepByStep && !current.isEqualTo(origin))
+    else if (this.stepByStep && current.id !== origin.id)
     {
       current.color = '#d1d1d1';
     };
@@ -106,16 +106,16 @@ class AStarPathfinder
 
     this.grid.getNeighbours(current).forEach(node => {
       const new_gCost = current.gCost + 1;
-      const isNodeNOTInOpen = !this.openSet.hasItem(node);
+      const isNodeNOTInOpen = !this.openSet.items.some(item => item.id === node.id);
       if (isNodeNOTInOpen || new_gCost < node.gCost)
       {
         node.gCost = new_gCost;
-        node.set_fCost(target);
+        node.fCost = node.gCost + node.getEuclideanDistance(target);
         node.parent = current;
         if (isNodeNOTInOpen)
         {
           this.openSet.push(node);
-          if (this.stepByStep && !node.isEqualTo(target)) node.color = '#ff9900';
+          if (this.stepByStep && node.id !== target.id) node.color = '#ff9900';
         }
       };
     });
@@ -150,7 +150,7 @@ class AStarPathfinder
       this.pathIsFound = false;
       return path;
     }
-    while(!current.isEqualTo(origin))
+    while(current.id !== origin.id)
     {
       path.push(current);
       current = current.parent;

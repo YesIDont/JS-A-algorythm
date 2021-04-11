@@ -19,65 +19,12 @@ class Node
     this.heapIndex = null;
   }
 
-  isEqualTo(other)
-  {
-    return this.id == other.id;
-  }
-
-  getStamp()
-  {
-    return this.x + this.y;
-  }
-
-  get_hCost(target)
-  {
-    const x = Math.abs(target.x - this.x);
-    const y = Math.abs(target.y - this.y);
-
-    return Math.sqrt(x * x + y * y);
-  }
-
-  get_fCost(target)
-  {
-    return this.gCost + this.getEuclideanDistance(target);
-  }
-
-  set_fCost(target)
-  {
-    this.fCost = this.get_fCost(target);
-  }
-
-  getCoordiatesDifference(other)
-  {
-    return {
-      dx: Math.abs(this.x - other.x),
-      dy: Math.abs(this.y - other.y),
-    }
-  }
-
   getEuclideanDistance(other)
   {
-    const { dx, dy } = this.getCoordiatesDifference(other);
+    const dx = Math.abs(this.x - other.x);
+    const dy = Math.abs(this.y - other.y);
 
     return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  getWeightedDistanceTo(other)
-  {
-    const { dx, dy } = this.getCoordiatesDifference(other);
-
-    if (dx > dy)
-    {
-      return 14 * dy + 10 * (dx - dy);
-    }
-    return 14 * dx + 10 * (dy - dx);
-  }
-
-  getManhatanDistanceTo(other)
-  {
-    const { dx, dy } = this.getCoordiatesDifference(other);
-
-    return dx + dy;
   }
 
   setAsObstacle()

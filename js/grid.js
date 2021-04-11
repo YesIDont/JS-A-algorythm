@@ -66,7 +66,7 @@ class Grid
         const { x, y } = node;
         const size = this.nodeSize;
 
-        const isPartOfPath = this.path && this.path.some(pathNode => pathNode.isEqualTo(node));
+        const isPartOfPath = this.path && this.path.some(pathNode => pathNode.id === node.id);
         ctx.fillStyle = isPartOfPath ? '#ff0000' : node.color;
         ctx.fillRect(x * size, y * size, size, size);
       });
@@ -214,7 +214,7 @@ class Grid
           node.fCost = null;
           if (shouldKeepOriginAndTarget)
           {
-            if (!node.isEqualTo(this.origin) && !node.isEqualTo(this.target)) node.color = 'transparent';
+            if (node.id !== this.origin.id && node.id !== this.target.id) node.color = 'transparent';
           }
           else
           {

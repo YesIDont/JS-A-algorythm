@@ -30,7 +30,7 @@ class heapTree {
 
   hasItem(item)
   {
-    return this.items.some(i => i.isEqualTo(item));
+    return this.items.some(i => i.id === item.id);
   }
 
   getLength()

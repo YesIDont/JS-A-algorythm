@@ -18,7 +18,6 @@ window.addEventListener('load', () => {
     // obstaclesDensity: 30,
     wallsDensity: 15,
     // randomOriginAndTarget: true,
-    // dummyMap,
   });
 
   pathfinder = new AStarPathfinder({ grid });
@@ -72,7 +71,7 @@ window.addEventListener('load', () => {
   
         if (node)
         {
-          if (mouse.isLeftDown && refNode && !node.isEqualTo(refNode))
+          if (mouse.isLeftDown && refNode && node.id !== refNode.id)
           {
             if (refNode.isObstacle)
             {
@@ -85,7 +84,7 @@ window.addEventListener('load', () => {
           }
           else
           {
-            if (!node.isObstacle && !pathfinder.isSearching && !node.isEqualTo(grid.target) && !pathfinder.searchIsLocked) {
+            if (!node.isObstacle && !pathfinder.isSearching && node.id !== grid.target.id && !pathfinder.searchIsLocked) {
               grid.setTarget(node);
               pathfinder.findPath(grid.origin, grid.target, (path) => { grid.path = path; });
             };

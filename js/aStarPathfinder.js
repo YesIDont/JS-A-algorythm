@@ -5,7 +5,7 @@ class AStarPathfinder {
     this.pathIsFound = false;
   }
 
-  findPath(origin, target, usePathCallback) {
+  findPath(origin, target, path, resetPathOnEmptySearch = false) {
     if (!origin || !target) return;
 
     this.searchSetup(origin, target);
@@ -14,27 +14,20 @@ class AStarPathfinder {
       if (!this.searchLoop(origin, target)) break;
     }
 
-    let path = [];
-    if (this.pathIsFound) {
-      path = this.tracePathBackToOrigin(origin, target);
-    }
+    if (resetPathOnEmptySearch) path.length = 0;
+    if (!this.pathIsFound) return;
+    if (!resetPathOnEmptySearch) path.length = 0;
 
-    this.finalizeSearch(path, usePathCallback);
+    this.tracePathBackToOrigin(origin, target, path);
   }
 
   searchSetup(origin, target) {
     this.pathIsFound = false;
-    this.grid.path = [];
     this.grid.reset(true);
     origin.gCost = 0;
-    origin.fCost = origin.gCost + origin.getEuclideanDistance(target);
+    origin.fCost = origin.gCost + this.getEuclideanDistance(origin, target);
     this.openSet.reset();
     this.openSet.push(origin);
-  }
-
-  finalizeSearch(path, usePathCallback) {
-    const length = path.length;
-    if (length) usePathCallback(path);
   }
 
   searchLoop(origin, target) {
@@ -59,7 +52,7 @@ class AStarPathfinder {
       );
       if (isNodeNOTInOpen || newgCost < node.gCost) {
         node.gCost = newgCost;
-        node.fCost = node.gCost + node.getEuclideanDistance(target);
+        node.fCost = node.gCost + this.getEuclideanDistance(node, target);
         node.parent = current;
         if (isNodeNOTInOpen) {
           this.openSet.push(node);
@@ -70,17 +63,24 @@ class AStarPathfinder {
     return true;
   }
 
-  tracePathBackToOrigin(origin, target) {
-    const path = [];
+  tracePathBackToOrigin(origin, target, path) {
     let current = target.parent;
     if (!current) {
       this.pathIsFound = false;
-      return path;
+      return;
     }
+
     while (current.id !== origin.id) {
       path.push(current);
       current = current.parent;
     }
-    return path.reverse();
+    path.reverse();
+  }
+
+  getEuclideanDistance(nodeFrom, nodeTo) {
+    const dx = Math.abs(nodeFrom.x - nodeTo.x);
+    const dy = Math.abs(nodeFrom.y - nodeTo.y);
+
+    return Math.sqrt(dx * dx + dy * dy);
   }
 }

@@ -5,6 +5,7 @@ window.addEventListener('load', () => {
   canvas.height = window.innerHeight;
 
   const cellSize = 8;
+  const path = [];
 
   grid = new Grid({
     width: Math.floor(canvas.width / cellSize),
@@ -23,22 +24,12 @@ window.addEventListener('load', () => {
     grid.setTarget(node);
   });
 
-  function fillCircle(ctx, center, radius, color = '#FF0000') {
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI, false);
-    ctx.fillStyle = color;
-    ctx.fill();
-  }
-
   function frame() {
-    pathfinder.findPath(grid.origin, grid.target, (path) => {
-      grid.path = path;
-    });
+    pathfinder.findPath(grid.origin, grid.target, path);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     grid.drawGrid(cellSize);
-    grid.drawNodes(cellSize);
-    fillCircle(ctx, { x: mouse.x, y: mouse.y }, 3);
+    grid.drawNodes(cellSize, path);
 
     requestAnimationFrame(frame);
   }

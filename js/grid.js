@@ -9,7 +9,6 @@ class Grid {
     ];
     this.nodes = [[]];
     this.origin = null;
-    this.path = [];
     this.target = null;
     this.width = width;
   }
@@ -29,14 +28,16 @@ class Grid {
     }
   }
 
-  drawNodes(size) {
+  drawNodes(size, path = []) {
     this.nodes.forEach((row) => {
       row.forEach((node) => {
         const { x, y } = node;
 
-        const isPartOfPath =
-          this.path && this.path.some((pathNode) => pathNode.id === node.id);
-        ctx.fillStyle = isPartOfPath ? '#ff0000' : node.color;
+        const isPartOfPath = path.some((pathNode) => pathNode.id === node.id);
+
+        if (!isPartOfPath && !node.isObstacle) return;
+
+        ctx.fillStyle = isPartOfPath ? '#ff0000' : '#000';
         ctx.fillRect(x * size, y * size, size, size);
       });
     });
@@ -87,22 +88,18 @@ class Grid {
     });
   }
 
-  loadSavedMap(map, cellSize) {
+  loadSavedMap(map) {
     this.nodes = [];
 
     let idCounter = 0;
     this.nodes = map.map((row, x) =>
       row.map((isObstacle, y) => {
-        const copy = new Node(
+        return new Node(
           x,
           y,
-          cellSize,
           isObstacle === 1 ? true : false,
-          idCounter
+          idCounter++
         );
-        idCounter++;
-
-        return copy;
       })
     );
 

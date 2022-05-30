@@ -7,7 +7,7 @@ class heapTree {
   push(item) {
     item.heapIndex = this.currentItemCount;
     this.items[this.currentItemCount] = item;
-    this._sortUp(item);
+    this.sortUp(item);
     this.currentItemCount++;
   }
 
@@ -17,7 +17,7 @@ class heapTree {
       const last = this.items.pop();
       this.items.unshift(last);
       this.items[0].heapIndex = 0;
-      if (this.items.length > 1) this._sortDown(this.items[0]);
+      if (this.items.length > 1) this.sortDown(this.items[0]);
     }
     this.currentItemCount -= 1;
 
@@ -37,42 +37,42 @@ class heapTree {
     this.currentItemCount = 0;
   }
 
-  _compareNumbers(A, B) {
+  compareNumbers(A, B) {
     if (A < B) return -1;
     if (A === B) return 0;
     return 1;
   }
 
-  _compareItems(A, B) {
-    let compare = this._compareNumbers(A.fCost, B.fCost);
-    if (compare == 0) compare = this._compareNumbers(A.hCost, B.hCost);
+  compareItems(A, B) {
+    let compare = this.compareNumbers(A.fCost, B.fCost);
+    if (compare == 0) compare = this.compareNumbers(A.hCost, B.hCost);
 
     return -compare;
   }
 
-  _getParentIndex(itemIndex) {
+  getParentIndex(itemIndex) {
     let parentIndex = Math.floor((itemIndex - 1) * 0.5);
     if (parentIndex < 0) return 0;
 
     return parentIndex;
   }
 
-  _sortUp(item) {
-    let parentIndex = this._getParentIndex(item.heapIndex);
+  sortUp(item) {
+    let parentIndex = this.getParentIndex(item.heapIndex);
 
     let shouldKeepSearching = true;
     while (shouldKeepSearching) {
       const parentItem = this.items[parentIndex];
-      if (parentItem && this._compareItems(item, parentItem) > 0) {
-        this._swap(item, parentItem);
+      if (parentItem && this.compareItems(item, parentItem) > 0) {
+        this.swap(item, parentItem);
       } else {
         shouldKeepSearching = false;
       }
-      parentIndex = this._getParentIndex(item.heapIndex);
+      parentIndex = this.getParentIndex(item.heapIndex);
     }
   }
 
-  _sortDown(item) {
+  sortDown(item) {
     let shouldKeepSearching = true;
     while (shouldKeepSearching) {
       const index = item.heapIndex;
@@ -89,14 +89,14 @@ class heapTree {
           childRightIndex < this.currentItemCount &&
           left &&
           right &&
-          this._compareItems(left, right) < 0
+          this.compareItems(left, right) < 0
         ) {
           swapIndex = childRightIndex;
         }
 
         const potential = this.items[swapIndex];
-        if (potential && this._compareItems(item, potential) < 0) {
-          this._swap(item, potential);
+        if (potential && this.compareItems(item, potential) < 0) {
+          this.swap(item, potential);
         } else {
           shouldKeepSearching = false;
         }
@@ -106,7 +106,7 @@ class heapTree {
     }
   }
 
-  _swap(A, B) {
+  swap(A, B) {
     const indexA = A.heapIndex;
     const indexB = B.heapIndex;
     B.heapIndex = indexA;

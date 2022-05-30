@@ -1,7 +1,8 @@
 let grid, pathfinder;
 
 window.addEventListener('load', () => {
-  canvas.updateSize();
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
   const size = 8;
 
@@ -22,9 +23,12 @@ window.addEventListener('load', () => {
     grid.setTarget(node);
   });
 
-  document.addEventListener('click', () => {
-    grid.logNodes();
-  });
+  function fillCircle(ctx, center, radius, color = '#FF0000') {
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI, false);
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
 
   function frame() {
     pathfinder.findPath(grid.origin, grid.target, (path) => {

@@ -1,5 +1,5 @@
 class Grid {
-  constructor({ height = 32, dummyMap, width = 32 }) {
+  constructor({ height = 32, width = 32 }) {
     this.height = height;
     this.neighbourAddressMods = [
       [0, -1],
@@ -12,11 +12,6 @@ class Grid {
     this.path = [];
     this.target = null;
     this.width = width;
-
-    this.loadSavedMap(dummyMap);
-    this.findNeighbours();
-    this.setOrigin(this.nodes[0][0]);
-    this.setTarget(this.nodes[0][height - 1]);
   }
 
   drawGrid(size) {
@@ -59,9 +54,9 @@ class Grid {
     this.target.isObstacle = false;
   }
 
-  getNodeUnderPointer(x, y, nodeSize) {
-    const row = Math.floor(y / nodeSize);
-    const column = Math.floor(x / nodeSize);
+  getCellUnderPointer(x, y, cellSize) {
+    const row = Math.floor(y / cellSize);
+    const column = Math.floor(x / cellSize);
 
     if (this.nodes[column] && this.nodes[column][row]) {
       return this.nodes[column][row];
@@ -92,7 +87,7 @@ class Grid {
     });
   }
 
-  loadSavedMap(map) {
+  loadSavedMap(map, cellSize) {
     this.nodes = [];
 
     let idCounter = 0;
@@ -101,7 +96,7 @@ class Grid {
         const copy = new Node(
           x,
           y,
-          this.nodeSize,
+          cellSize,
           isObstacle === 1 ? true : false,
           idCounter
         );
@@ -110,6 +105,10 @@ class Grid {
         return copy;
       })
     );
+
+    this.findNeighbours();
+    this.setOrigin(this.nodes[0][0]);
+    this.setTarget(this.nodes[0][this.height - 1]);
   }
 
   reset(shouldKeepOriginAndTarget) {

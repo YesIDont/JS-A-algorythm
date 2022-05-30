@@ -9,13 +9,14 @@ window.addEventListener('load', () => {
   grid = new Grid({
     width: Math.floor(canvas.width / cellSize),
     height: Math.floor(canvas.height / cellSize),
-    dummyMap: JSON.parse(savedMap),
   });
+
+  grid.loadSavedMap(JSON.parse(savedMap));
 
   pathfinder = new AStarPathfinder(grid);
 
   document.addEventListener('mousemove', () => {
-    const node = grid.getNodeUnderPointer(mouse.x, mouse.y, cellSize);
+    const node = grid.getCellUnderPointer(mouse.x, mouse.y, cellSize);
 
     if (!node || node.isObstacle || node.id === grid.target.id) return;
 

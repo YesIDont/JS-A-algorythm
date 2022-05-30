@@ -9,9 +9,6 @@ window.addEventListener('load', () => {
     width: Math.floor(canvas.width / size),
     height: Math.floor(canvas.height / size),
     nodeSize: size,
-    obstaclesDensity: 20,
-    numberOfWals: 165,
-    numberOfClearPassages: 35,
     dummyMap: JSON.parse(savedMap),
   });
 

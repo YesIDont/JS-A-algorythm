@@ -8,7 +8,7 @@ class AStarPathfinder {
   findPath(origin, target, usePathCallback) {
     if (!origin || !target) return;
 
-    const startTime = this.searchSetup(origin, target);
+    this.searchSetup(origin, target);
 
     while (true) {
       if (!this.searchLoop(origin, target)) break;
@@ -19,7 +19,7 @@ class AStarPathfinder {
       path = this.tracePathBackToOrigin(origin, target);
     }
 
-    this.finalizeSearch(startTime, path, usePathCallback);
+    this.finalizeSearch(path, usePathCallback);
   }
 
   searchSetup(origin, target) {
@@ -30,22 +30,10 @@ class AStarPathfinder {
     origin.fCost = origin.gCost + origin.getEuclideanDistance(target);
     this.openSet.reset();
     this.openSet.push(origin);
-
-    const startTime = Date.now();
-    return startTime;
   }
 
-  logPathTimeAndLenght(time, length) {
-    // if (this.pathIsFound) {
-    //   console.log(`Found path in: ${time} ms, length: ${length}`);
-    //   return;
-    // }
-    // console.log(`Could not find the path :/`);
-  }
-
-  finalizeSearch(startTime, path, usePathCallback) {
+  finalizeSearch(path, usePathCallback) {
     const length = path.length;
-    this.logPathTimeAndLenght(Date.now() - startTime, length);
     if (length) usePathCallback(path);
   }
 

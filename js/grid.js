@@ -1,13 +1,5 @@
 class Grid {
-  constructor({
-    height = 32,
-    dummyMap,
-    numberOfWals = 0,
-    numberOfClearPassages = 0,
-    obstaclesDensity = 0,
-    nodeSize = 8,
-    width = 32,
-  }) {
+  constructor({ height = 32, dummyMap, nodeSize = 8, width = 32 }) {
     this.height = height;
     this.neighbourAddressMods = [
       [0, -1],
@@ -22,20 +14,10 @@ class Grid {
     this.target = null;
     this.width = width;
 
-    if (dummyMap) {
-      this._loadSavedMap(dummyMap);
-    } else {
-      this.generate({
-        obstaclesDensity,
-        numberOfWals,
-        numberOfClearPassages,
-        nodeSize,
-      });
-    }
-
+    this.loadSavedMap(dummyMap);
+    this.findNeighbours();
     this.setOrigin(this.nodes[0][0]);
     this.setTarget(this.nodes[0][height - 1]);
-    this.findNeighbours();
   }
 
   drawGrid() {
@@ -113,66 +95,7 @@ class Grid {
     });
   }
 
-  generate({
-    obstaclesDensity = 0,
-    numberOfWals = 0,
-    numberOfClearPassages = 0,
-    cellsHorizontally,
-    cellsVertically,
-    nodeSize,
-  }) {
-    const width = cellsHorizontally || this.width;
-    const height = cellsVertically || this.height;
-    const size = nodeSize || this.nodeSize;
-    this.nodes = [];
-    let idCounter = 0;
-    for (let x = 0; x < width; x++) {
-      this.nodes[x] = [];
-      for (let y = 0; y < height; y++) {
-        this.nodes[x][y] = new Node(
-          x,
-          y,
-          size,
-          dice100(obstaclesDensity),
-          idCounter
-        );
-        idCounter++;
-      }
-    }
-    if (numberOfWals > 0)
-      doNTimes(numberOfWals, () => {
-        this._makeRandomWall();
-      });
-    if (numberOfClearPassages > 0)
-      doNTimes(numberOfClearPassages, () => {
-        this._makeRandomWall(true);
-      });
-  }
-
-  setRandomOriginAndTarget() {
-    this.origin = this._getRandomNode();
-    this.origin.isObstacle = false;
-    this.origin.color = '#0055FF';
-    this.target = this._getRandomNode();
-    this.target.isObstacle = false;
-    this.target.color = '#00DD00';
-  }
-
-  logNodes() {
-    const savedNodes = [];
-
-    this.nodes.forEach((row, x) => {
-      savedNodes[x] = [];
-
-      row.forEach((node, y) => {
-        savedNodes[x][y] = node.isObstacle ? 1 : 0;
-      });
-    });
-
-    console.log(JSON.stringify(savedNodes));
-  }
-
-  _loadSavedMap(map) {
+  loadSavedMap(map) {
     this.nodes = [];
 
     let idCounter = 0;
@@ -190,41 +113,6 @@ class Grid {
         return copy;
       })
     );
-  }
-
-  _getRandomNode() {
-    const row = getRandomFromRange(0, this.height - 1, true);
-    const column = getRandomFromRange(0, this.width - 1, true);
-
-    return this.nodes[column][row];
-  }
-
-  _makeWall(start, end, isClearWall) {
-    let min, max;
-    const isHorizontal = start.y === end.y;
-    const mod = isHorizontal ? 'x' : 'y';
-    min = Math.min(start[mod], end[mod]);
-    max = Math.max(start[mod], end[mod]);
-
-    for (let i = min; i <= max; i++) {
-      const x = isHorizontal ? i : start.x;
-      const y = isHorizontal ? start.y : i;
-      if (this.nodes[x] && this.nodes[x][y]) {
-        const node = this.nodes[x][y];
-        node.setAsObstacle();
-        if (isClearWall) node.setAsNonObstacle();
-      }
-    }
-  }
-
-  _makeRandomWall(clear = false) {
-    const start = this._getRandomNode();
-    const end = start.getCopy();
-    const axis = flipCoin() ? 'x' : 'y';
-    const axisSize = axis === 'x' ? this.width : this.height;
-    const size = getRandomFromRange(Math.round(axisSize / 4), axisSize);
-    end[axis] += getRandomFromRange(-size, size);
-    this._makeWall(start, end, clear);
   }
 
   reset(shouldKeepOriginAndTarget) {

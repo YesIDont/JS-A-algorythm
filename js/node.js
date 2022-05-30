@@ -1,7 +1,5 @@
-class Node
-{
-  constructor(row, column, size, isObstacle, id)
-  {
+class Node {
+  constructor(row, column, size, isObstacle, id = 0) {
     this.id = id;
     this.x = row;
     this.y = column;
@@ -17,34 +15,31 @@ class Node
     this.color = isObstacle ? '#000' : 'transparent';
     this.parent = null;
     this.heapIndex = null;
+    this.neighbours = [];
   }
 
-  getEuclideanDistance(other)
-  {
+  getEuclideanDistance(other) {
     const dx = Math.abs(this.x - other.x);
     const dy = Math.abs(this.y - other.y);
 
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  setAsObstacle()
-  {
+  setAsObstacle() {
     this.isObstacle = true;
     this.color = '#000';
 
     return this;
   }
 
-  setAsNonObstacle()
-  {
+  setAsNonObstacle() {
     this.isObstacle = false;
     this.color = 'transparent';
 
     return this;
   }
 
-  getCopy()
-  {
+  getCopy() {
     return new Node(this.x, this.y, this.size, this.isObstacle, this.id);
   }
 }

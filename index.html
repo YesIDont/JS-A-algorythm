@@ -8,48 +8,17 @@
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <div class="tools">
-      <div class="settings">
-        <label for="continuous-search">
-          Continuous search (C)
-          <input id="continuous-search" type="checkbox" checked style="margin-right: 15px;">|
-        </label>
-        <label for="step-by-step">
-          Step-by-step search
-          <input id="step-by-step" type="checkbox">
-        </label>
-        <label for="random-origin-and-target">
-          Randomize origin and target
-          <input id="random-origin-and-target" type="checkbox">
-        </label>
-        <button type="button" id="run-single-search">Run single search</button>
-      </div>
-      <!-- <div class="settings">
-        <label for="generate-walls">
-          Generate walls
-          <input id="generate-walls" type="checkbox">
-        </label>
-        <label for="grid-single-cell-size">
-          Single cell size on the grid
-          <input id="grid-single-cell-size" type="number">
-        </label>
-        <button type="button" id="generate-new-grid">Generate grid</button>
-      </div> -->
-    </div>
-    <div id="canvas-layers">
-      <canvas id="dynamics"></canvas>
-      <canvas id="statics"></canvas>
-    </div>
+    <canvas id="canvas"></canvas>
+
+    <script src="js/savedMap.js"></script>
     <script src="js/rAF.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/mouse.js"></script>
     <script src="js/canvas.js"></script>
     <script src="js/node.js"></script>
     <script src="js/heapTree.js"></script>
-    <script src="js/dummyMap.js"></script>
     <script src="js/grid.js"></script>
     <script src="js/aStarPathfinder.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/index.js"></script>
+    <script src="index.js"></script>
   </body>
 </html>

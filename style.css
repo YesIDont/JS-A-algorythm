@@ -1,68 +1,14 @@
-html, body {
+html,
+body {
   width: 100vw;
   height: 100vh;
 }
 
-#canvas-layers {
-  width: 100%;
-  height: calc(100% - 26px);
-  position: relative;
-}
-
-#canvas-layers canvas {
+#canvas {
   background-color: transparent;
-  display: block;
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-}
-
-#canvas-layers #dynamics {
-  z-index: 2;
-}
-
-#canvas-layers #statics {
-  z-index: 1;
-}
-
-.tools {
-  background-color: #333;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px;
-  height: 14px;
-  border-bottom: 2px solid #0099ff;
-}
-
-.settings {
-  display: flex;
-  align-items: center;
-}
-
-.settings > *:not(:last-child) {
-  margin-right: 15px;
-}
-
-label {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  line-height: 14px;
-}
-
-input {
-  margin-left: 5px;
-  border: 1px solid #999;
-}
-
-#grid-single-cell-size {
-  width: 50px;
-}
-
-#apply-settings {
-  margin-left: 20px;
 }

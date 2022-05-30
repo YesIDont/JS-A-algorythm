@@ -1,157 +1,95 @@
-class AStarPathfinder
-{
-  constructor({ grid, stepDelay = 0, stepByStep = false }) {
+class AStarPathfinder {
+  constructor(grid) {
     this.grid = grid;
     this.openSet = new heapTree();
-    this.stepDelay = stepDelay;
-    this.stepByStep = stepByStep;
     this.pathIsFound = false;
-    this.isSearching = false;
-    this.searchIsLocked = false;
-    this.shouldBreake = false;
   }
 
-  findPath(origin, target, usePathCallback)
-  {
-    if (!this.isSearching && origin && target)
-    {
-      const startTime = this._searchSetup(origin, target);
+  findPath(origin, target, usePathCallback) {
+    if (!origin || !target) return;
 
-      while(true)
-      {
-        if (!this._searchLoop(origin, target)) break;
-      }
+    const startTime = this.searchSetup(origin, target);
 
-      let path = [];
-      if (this.pathIsFound)
-      {
-        path = this._tracePathBackToOrigin(origin, target);
-      }
-      this._finalizeSearch(startTime, path, usePathCallback);
+    while (true) {
+      if (!this.searchLoop(origin, target)) break;
     }
-  }
 
-  async findPathStepByStep(origin, target, usePathCallback)
-  {
-    if (!this.isSearching && origin && target)
-    {
-      try {
-        this.stepByStep = true;
-        const startTime = this._searchSetup(origin, target, true);
-        const path = await new Promise((resolve) => {
-          this._loopDelayed(origin, target, resolve);
-        });
-        this._finalizeSearch(startTime, path, usePathCallback);
-      }
-      catch (error)
-      {
-        console.log(error);
-      }
+    let path = [];
+    if (this.pathIsFound) {
+      path = this.tracePathBackToOrigin(origin, target);
     }
+
+    this.finalizeSearch(startTime, path, usePathCallback);
   }
 
-  _searchSetup(origin, target)
-  {
+  searchSetup(origin, target) {
     this.pathIsFound = false;
-    this.isSearching = true;
     this.grid.path = [];
     this.grid.reset(true);
-    const startTime = Date.now();
     origin.gCost = 0;
     origin.fCost = origin.gCost + origin.getEuclideanDistance(target);
     this.openSet.reset();
     this.openSet.push(origin);
 
+    const startTime = Date.now();
     return startTime;
   }
 
-  _logPathTimeAndLenght(time, length)
-  {
-    if (this.pathIsFound)
-    {
-      console.log(`Found path in: ${time} ms, length: ${length}`);
-      return;
-    }
-
-    console.log(`Could not find the path :/`);
+  logPathTimeAndLenght(time, length) {
+    // if (this.pathIsFound) {
+    //   console.log(`Found path in: ${time} ms, length: ${length}`);
+    //   return;
+    // }
+    // console.log(`Could not find the path :/`);
   }
 
-  _finalizeSearch(startTime, path, usePathCallback)
-  {
+  finalizeSearch(startTime, path, usePathCallback) {
     const length = path.length;
-    this._logPathTimeAndLenght(Date.now() - startTime, length);
+    this.logPathTimeAndLenght(Date.now() - startTime, length);
     if (length) usePathCallback(path);
-    this.isSearching = false;
-    this.shouldBreake = false;
   }
 
-  _searchLoop(origin, target)
-  {
+  searchLoop(origin, target) {
     let current = this.openSet.pullOutTheLowest();
 
     if (!current || !origin || !target) return false;
-    
-    if (current.id === target.id)
-    {
+
+    if (current.id === target.id) {
       this.pathIsFound = true;
 
       return false;
     }
-    else if (this.stepByStep && current.id !== origin.id)
-    {
-      current.color = '#d1d1d1';
-    };
 
     current.wasVisisted = true;
 
-    this.grid.getNeighbours(current).forEach(node => {
-      const new_gCost = current.gCost + 1;
-      const isNodeNOTInOpen = !this.openSet.items.some(item => item.id === node.id);
-      if (isNodeNOTInOpen || new_gCost < node.gCost)
-      {
-        node.gCost = new_gCost;
+    current.neighbours.forEach((node) => {
+      if (node.wasVisisted) return;
+
+      const newgCost = current.gCost + 1;
+      const isNodeNOTInOpen = !this.openSet.items.some(
+        (item) => item.id === node.id
+      );
+      if (isNodeNOTInOpen || newgCost < node.gCost) {
+        node.gCost = newgCost;
         node.fCost = node.gCost + node.getEuclideanDistance(target);
         node.parent = current;
-        if (isNodeNOTInOpen)
-        {
+        if (isNodeNOTInOpen) {
           this.openSet.push(node);
-          if (this.stepByStep && node.id !== target.id) node.color = '#ff9900';
         }
-      };
+      }
     });
 
     return true;
   }
 
-  _loopDelayed(origin, target, resolve)
-  {
-    if (this.shouldBreake) return resolve([]);
-    setTimeout(() => {
-
-      if (this._searchLoop(origin, target, true))
-      {
-        this._loopDelayed(origin, target, resolve);
-
-        return;
-      }
-      let path = [];
-      if (this.pathIsFound) path = this._tracePathBackToOrigin(origin, target);
-      resolve(path);
-
-    }, this.stepDelay);
-  }
-
-  _tracePathBackToOrigin(origin, target)
-  {
+  tracePathBackToOrigin(origin, target) {
     const path = [];
     let current = target.parent;
-    if (!current)
-    {
+    if (!current) {
       this.pathIsFound = false;
       return path;
     }
-    while(current.id !== origin.id)
-    {
+    while (current.id !== origin.id) {
       path.push(current);
       current = current.parent;
     }

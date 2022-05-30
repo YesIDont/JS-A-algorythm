@@ -1,5 +1,5 @@
 class Grid {
-  constructor({ height = 32, dummyMap, nodeSize = 8, width = 32 }) {
+  constructor({ height = 32, dummyMap, width = 32 }) {
     this.height = height;
     this.neighbourAddressMods = [
       [0, -1],
@@ -8,7 +8,6 @@ class Grid {
       [-1, 0],
     ];
     this.nodes = [[]];
-    this.nodeSize = nodeSize;
     this.origin = null;
     this.path = [];
     this.target = null;
@@ -20,8 +19,7 @@ class Grid {
     this.setTarget(this.nodes[0][height - 1]);
   }
 
-  drawGrid() {
-    const size = this.nodeSize;
+  drawGrid(size) {
     const rows = this.nodes.length;
     const columns = this.nodes[0].length;
     let r = 0;
@@ -36,11 +34,10 @@ class Grid {
     }
   }
 
-  drawNodes() {
+  drawNodes(size) {
     this.nodes.forEach((row) => {
       row.forEach((node) => {
         const { x, y } = node;
-        const size = this.nodeSize;
 
         const isPartOfPath =
           this.path && this.path.some((pathNode) => pathNode.id === node.id);
@@ -62,9 +59,9 @@ class Grid {
     this.target.isObstacle = false;
   }
 
-  getNodeUnderPointer(x, y) {
-    const row = Math.floor(y / this.nodeSize);
-    const column = Math.floor(x / this.nodeSize);
+  getNodeUnderPointer(x, y, nodeSize) {
+    const row = Math.floor(y / nodeSize);
+    const column = Math.floor(x / nodeSize);
 
     if (this.nodes[column] && this.nodes[column][row]) {
       return this.nodes[column][row];

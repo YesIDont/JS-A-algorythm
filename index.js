@@ -4,19 +4,18 @@ window.addEventListener('load', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  const size = 8;
+  const cellSize = 8;
 
   grid = new Grid({
-    width: Math.floor(canvas.width / size),
-    height: Math.floor(canvas.height / size),
-    nodeSize: size,
+    width: Math.floor(canvas.width / cellSize),
+    height: Math.floor(canvas.height / cellSize),
     dummyMap: JSON.parse(savedMap),
   });
 
   pathfinder = new AStarPathfinder(grid);
 
   document.addEventListener('mousemove', () => {
-    const node = grid.getNodeUnderPointer(mouse.x, mouse.y);
+    const node = grid.getNodeUnderPointer(mouse.x, mouse.y, cellSize);
 
     if (!node || node.isObstacle || node.id === grid.target.id) return;
 
@@ -36,8 +35,8 @@ window.addEventListener('load', () => {
     });
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    grid.drawGrid();
-    grid.drawNodes();
+    grid.drawGrid(cellSize);
+    grid.drawNodes(cellSize);
     fillCircle(ctx, { x: mouse.x, y: mouse.y }, 3);
 
     requestAnimationFrame(frame);
